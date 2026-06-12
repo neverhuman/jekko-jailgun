@@ -12,6 +12,10 @@
       "command": "bash scripts/ci-local.sh",
       "purpose": "verify GitLab dispatch stays aligned with local CI wrappers"
     },
+    ".env.example": {
+      "command": "just fast",
+      "purpose": "verify the environment template stays parseable"
+    },
     "AGENTS.md": {
       "command": "just fast",
       "purpose": "verify repo instructions stay visible"
@@ -36,6 +40,10 @@
       "command": "bash ops/ci/jankurai.sh",
       "purpose": "verify the Jankurai metadata bundle stays clean"
     },
+    ".jankurai/": {
+      "command": "bash ops/ci/jankurai.sh",
+      "purpose": "verify Jankurai score history and evidence stay refreshed by the audit lane"
+    },
     "docs/": {
       "command": "just fast",
       "purpose": "verify agent-readable docs stay routed"
@@ -55,6 +63,10 @@
     "scripts/": {
       "command": "bash -n scripts/ci-doctor.sh && bash -n scripts/ci-local.sh",
       "purpose": "verify local CI helper scripts parse"
+    },
+    "tools/": {
+      "command": "bash -n tools/security-lane.sh",
+      "purpose": "verify ported jailgun tool scripts parse"
     },
     "src/": {
       "command": "just test",
@@ -80,9 +92,81 @@
       "command": "just test",
       "purpose": "verify domain crate manifest stays compiled"
     },
+    "crates/": {
+      "command": "cargo test --workspace --all-features",
+      "purpose": "verify all workspace crates including the ported jailgun crates stay green"
+    },
+    "crates/jailgun-core/": {
+      "command": "cargo test --workspace --all-features",
+      "purpose": "verify jailgun core models, config, receipts, and browser registry stay green"
+    },
+    "crates/jailgun-deploy/": {
+      "command": "cargo test -p jailgun-deploy --all-features",
+      "purpose": "verify deploy orchestration and cleanup policy stay green"
+    },
+    "crates/jailgun-notify/": {
+      "command": "cargo test -p jailgun-notify --all-features",
+      "purpose": "verify telegram notifier stays green"
+    },
+    "crates/jailgun-orchestrator/": {
+      "command": "cargo test -p jailgun-orchestrator --all-features",
+      "purpose": "verify bridge coordination and run event flow stay green"
+    },
+    "crates/jailgun-server/": {
+      "command": "cargo test -p jailgun-server --all-features",
+      "purpose": "verify REST/WebSocket/MCP routes stay green"
+    },
+    "crates/jailgun-cli/": {
+      "command": "cargo test -p jailgun-cli --all-features",
+      "purpose": "verify the jailgun and jailhard CLIs stay green"
+    },
+    "apps/": {
+      "command": "npm run test --workspaces --if-present",
+      "purpose": "verify ported jailgun node apps stay green"
+    },
+    "apps/dashboard/": {
+      "command": "npm run test --workspace @jailgun/dashboard",
+      "purpose": "verify the dashboard renders and websocket flows stay green"
+    },
     "contracts/": {
-      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+      "command": "bash ops/jailgun/ci/contracts.sh",
       "purpose": "verify contract drift checks and contract skeletons stay visible"
+    },
+    "contracts/json-schema/event.schema.json": {
+      "command": "bash ops/jailgun/ci/contracts.sh",
+      "purpose": "verify the generated event schema stays in sync with the Rust event source"
+    },
+    "contracts/fixtures/events/": {
+      "command": "bash ops/jailgun/ci/contracts.sh",
+      "purpose": "verify generated event fixtures stay in sync with the schema"
+    },
+    "config/": {
+      "command": "cargo test --workspace --all-features",
+      "purpose": "verify the jailgun config example stays loadable by jailgun-core"
+    },
+    "prompts/examples/": {
+      "command": "just fast",
+      "purpose": "verify example prompts stay routed and contain no real task bodies"
+    },
+    "assets/": {
+      "command": "just fast",
+      "purpose": "verify static assets stay routed"
+    },
+    "test-fixtures/": {
+      "command": "cargo test --workspace --all-features",
+      "purpose": "verify the test configuration fixture stays loadable"
+    },
+    "package.json": {
+      "command": "npm run typecheck",
+      "purpose": "verify the node workspace manifest stays installable and typechecks"
+    },
+    "package-lock.json": {
+      "command": "npm run typecheck",
+      "purpose": "verify the node dependency lock stays in sync"
+    },
+    "tsconfig.base.json": {
+      "command": "npm run typecheck",
+      "purpose": "verify the shared TypeScript config stays valid"
     },
     "db/": {
       "command": "jankurai doctor --fail-on critical",

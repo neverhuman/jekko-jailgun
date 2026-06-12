@@ -1,2 +1,35 @@
+# split-family child scaffolding
 /target
 /.jankurai
+
+# jailgun runtime state, secrets, and build output (regenerated, never committed)
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+*.color.log
+*.pid
+artifacts/
+downloads/
+logs/
+receipts/
+profiles/
+browser-state/
+.jailgun/
+.jailgun-run/
+.cache/
+.vite/
+dist/
+target/
+node_modules/
+coverage/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+config/*.local.toml
+prompts/local/
+tips/headless/
+telegram/
+managed-browsers.json

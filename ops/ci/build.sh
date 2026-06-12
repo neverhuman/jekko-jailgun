@@ -9,4 +9,4 @@ export CARGO_HOME="${CARGO_HOME:-${cargo_cache_root}/cargo-home}"
 export SCCACHE_DIR="${SCCACHE_DIR:-${cargo_cache_root}/sccache}"
 export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
 export RUSTC_WRAPPER="${RUSTC_WRAPPER:-sccache}"
-cargo build --locked -p jekko-jailgun --all-targets
+cargo build --locked --workspace --all-targets

@@ -1,16 +1,16 @@
 {
-  "report_fingerprint": "sha256:4994ce58d05194bee2e34718dd80df05c946d2c2425a3ff09b4aaa0cc8515eda",
-  "input_fingerprint": "sha256:3ec5534678d59e6ef1a9a17b437af9daf559c8580ba2d04b5168bf8ae2c5e5e5",
+  "report_fingerprint": "sha256:6d60ed7476f724ac9529b8e78418e80e4df997960581cddd44ee9f6f3842ec40",
+  "input_fingerprint": "sha256:c32978bb08b55a92d40298c2aaabdd6c83a98fa2bc49726c2552a6c9300df711",
   "policy_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
   "manifest_fingerprints": {
-    "owner_map": "sha256:a50854f519d44980ef5b3a7a1573e6eb6a24d025a32d72d6e6874f5f7d29a3b6",
-    "test_map": "sha256:19c9922d877ea1d58ca7cdb13e394515c55d62b55a42b484f4942c221836587f",
-    "generated_zones": "sha256:4abfb477fffea6a8188770acedaa56ead313947c05c107b74a5644345354723e",
-    "boundaries": "sha256:5cddf1e4795e01583b6c7cb11308051ec75904f66afce9c7c43d291e95af383f",
+    "owner_map": "sha256:d69a8afec3d4bfaa0a7becfeb044ba322bdccc40b47e5703046ba5ef61e6f70f",
+    "test_map": "sha256:7bef1a87c625b5f39e456b03daee4d386fa74a439967d81d02cf5f47fe8b92b5",
+    "generated_zones": "sha256:21a979572f54caf122ac5e107eb9e2ae4ad7de29d4086bdbf67de3a6996303ab",
+    "boundaries": "sha256:6a3023594b57b4e533c8a7152c821d36738b1db3c89630c4b315e99e62fa60b1",
     "standard_version": "sha256:27e5d92b64d86aacffcf8461e47e810188bca4716aaa6a2d1f74140d65ad220e"
   },
   "dirty_worktree": true,
-  "generated_at": "1781216508",
+  "generated_at": "1781259185",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
@@ -24,23 +24,23 @@
   "conformance_decision": "pass",
   "conformance_blockers": [],
   "repo": ".",
-  "run_id": "1781216508",
-  "started_at": "1781216508",
-  "elapsed_ms": 76,
+  "run_id": "1781259185",
+  "started_at": "1781259185",
+  "elapsed_ms": 3603,
   "scope": {
     "mode": "full",
     "paths": []
   },
-  "score": 85,
-  "raw_score": 85,
+  "score": 86,
+  "raw_score": 86,
   "decision": {
     "status": "advisory",
     "minimum_score": 85,
     "passed": true,
     "hard_findings": 0,
-    "soft_findings": 3,
+    "soft_findings": 22,
     "ratchet": {
-      "baseline_score": 85,
+      "baseline_score": 86,
       "allowed_drop": 0,
       "passed": true,
       "score_delta": 0,
@@ -53,7 +53,7 @@
     }
   },
   "git": {
-    "head": "f20a918",
+    "head": "3ce701f",
     "base": null,
     "changed_files": 0,
     "mode": "full",
@@ -318,6 +318,7 @@
         "jankurai audit lane found in CI",
         "web e2e lane present or no web surface",
         "rendered UX QA lane present or no web surface",
+        "DOM geometry UX QA runtime found",
         "Rust property/integration tests present or no Rust surface"
       ],
       "notes": []
@@ -325,16 +326,19 @@
     {
       "name": "Security and supply-chain posture",
       "weight": 12,
-      "score": 80,
-      "weighted_points": 9.6,
+      "score": 86,
+      "weighted_points": 10.32,
       "evidence": [
         "lockfile present",
         "secret or dependency scan tooling found",
         "provenance/SBOM tooling found",
         "workflow linting tooling found",
         "security lane present",
+        "canonical security lane wrapper present",
         "agent-readiness audit gate found in CI",
-        "rust bad-behavior advisory signals: 1",
+        "rust bad-behavior advisory signals: 425",
+        "typescript bad-behavior advisory signals: 1",
+        "gittools bad-behavior advisory signals: 1",
         "secret scanning command is operational"
       ],
       "notes": []
@@ -342,13 +346,15 @@
     {
       "name": "Code shape and semantic surface",
       "weight": 12,
-      "score": 90,
-      "weighted_points": 10.8,
+      "score": 80,
+      "weighted_points": 9.6,
       "evidence": [
-        "largest authored code file: crates/domain/src/lib.rs (57 LOC)",
-        "copy-code advisory classes found: 1 (advisory only, no score impact)",
-        "authored code stays below hard LOC limits with no shape markers",
-        "rust bad-behavior advisory signals: 1",
+        "largest authored code file: crates/jailgun-core/src/browser_registry/leases.rs (441 LOC)",
+        "most code files stay under 300 LOC",
+        "copy-code advisory classes found: 11 (advisory only, no score impact)",
+        "rust bad-behavior advisory signals: 425",
+        "typescript bad-behavior advisory signals: 1",
+        "gittools bad-behavior advisory signals: 1",
         "no hard bad-behavior findings across detector-backed language families"
       ],
       "notes": []
@@ -369,15 +375,19 @@
     {
       "name": "Observability and repair evidence",
       "weight": 8,
-      "score": 73,
-      "weighted_points": 5.84,
+      "score": 88,
+      "weighted_points": 7.04,
       "evidence": [
+        "observability libraries or patterns found",
         "ops/observability directory present",
+        "repair receipts or raw artifact language found",
         "agent-friendly exception pattern found",
         "repair-hint and receipt convention are documented",
         "repair receipt guidance is documented"
       ],
-      "notes": []
+      "notes": [
+        "free-form logging appears in scope"
+      ]
     },
     {
       "name": "Context economy and agent instructions",
@@ -401,7 +411,7 @@
       "weighted_points": 0.7,
       "evidence": [
         "control-plane files present",
-        "applicable=16",
+        "applicable=18",
         "configured=0",
         "ci_evidence=0",
         "artifact_verified=0"
@@ -441,24 +451,85 @@
     }
   ],
   "ux_qa": {
-    "web_surface": false,
+    "web_surface": true,
     "has_rendered_ux_lane": true,
     "missing_categories": [],
     "evidence": {
-      "accessibility": [],
-      "api_mocks": [],
-      "artifact_backed_proof": [],
-      "design_tokens": [],
-      "geometry_runtime": [],
-      "layout_stability": [],
-      "playwright_visual": [],
-      "storybook": [],
-      "visual_review": []
+      "accessibility": [
+        ".jankurai/repo-score.json",
+        "ops/jailgun/ci/ux-qa.sh",
+        "scripts/render-dashboard-ux-qa.mjs"
+      ],
+      "api_mocks": [
+        "ops/jailgun/ci/ux-qa.sh",
+        "package-lock.json",
+        "scripts/render-dashboard-ux-qa.mjs"
+      ],
+      "artifact_backed_proof": [
+        "apps/chrome-bridge/bin/chrome-bridge.mjs",
+        "apps/dashboard/src/App.drilldown.test.tsx",
+        "apps/dashboard/src/components/FailureTooltip.tsx",
+        "apps/dashboard/src/components/TabProgressBar.tsx",
+        "ops/jailgun/ci/ux-qa.sh"
+      ],
+      "design_tokens": [
+        "ops/jailgun/ci/ux-qa.sh",
+        "scripts/render-dashboard-ux-qa.mjs"
+      ],
+      "geometry_runtime": [
+        "apps/browser-adapter/bin/live-capture.mjs",
+        "apps/browser-adapter/src/domContracts/domHelpers.ts",
+        "apps/browser-adapter/src/domContracts/popups.ts",
+        "apps/browser-adapter/src/domContracts/rateLimit.ts",
+        "ops/jailgun/ci/ux-qa.sh"
+      ],
+      "layout_stability": [
+        "ops/jailgun/ci/ux-qa.sh",
+        "scripts/render-dashboard-ux-qa.mjs"
+      ],
+      "playwright_visual": [
+        "apps/chrome-bridge/bin/chrome-bridge.mjs",
+        "ops/jailgun/ci/ux-qa.sh",
+        "scripts/render-dashboard-ux-qa.mjs"
+      ],
+      "storybook": [
+        ".jankurai/repo-score.json"
+      ],
+      "visual_review": [
+        "ops/jailgun/ci/ux-qa.sh",
+        "scripts/render-dashboard-ux-qa.mjs"
+      ]
+    },
+    "artifact": {
+      "path": "target/jankurai/ux-qa.json",
+      "report_count": 2,
+      "worst_decision": "pass",
+      "total_violations": 0,
+      "summary_errors": 0,
+      "summary_warnings": 0,
+      "reports_missing_required_states": 0,
+      "missing_state_names": [],
+      "artifact_counts_by_kind": {
+        "accessibility": 2,
+        "aria-snapshot": 2,
+        "screenshot": 2
+      },
+      "reports_missing_required_artifacts": 0,
+      "missing_artifact_kinds": [],
+      "reports_missing_required_accessibility_artifact": 0,
+      "accessibility_violation_total": 0,
+      "accessibility_incomplete_total": 0,
+      "accessibility_pass_total": 24,
+      "artifact_fingerprint_count": 6,
+      "visual_baseline_missing": 0,
+      "visual_baseline_changed": 0,
+      "visual_baseline_review": 0,
+      "visual_baseline_block": 0
     }
   },
   "tool_adoption": {
     "control_plane_present": true,
-    "applicable_count": 16,
+    "applicable_count": 18,
     "configured_count": 0,
     "ci_evidence_count": 0,
     "artifact_verified_count": 0,
@@ -685,8 +756,8 @@
         "id": "ux-qa",
         "category": "ux",
         "mode": "auto",
-        "applicable": false,
-        "status": "not_applicable",
+        "applicable": true,
+        "status": "missing",
         "replaced_tools": [
           "playwright",
           "axe-core",
@@ -695,7 +766,10 @@
         "evidence": [
           "mode=auto"
         ],
-        "missing": [],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
         "local_command": "jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json",
         "ci_command": "jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json",
         "artifact_paths": [
@@ -838,15 +912,18 @@
         "id": "input-boundary",
         "category": "security",
         "mode": "auto",
-        "applicable": false,
-        "status": "not_applicable",
+        "applicable": true,
+        "status": "missing",
         "replaced_tools": [
           "manual unsafe sink review"
         ],
         "evidence": [
           "mode=auto"
         ],
-        "missing": [],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
         "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
@@ -925,7 +1002,7 @@
       }
     ],
     "evidence": {
-      "applicable_count": 16,
+      "applicable_count": 18,
       "applicable_tools": [
         "audit-ci",
         "proof-routing",
@@ -936,10 +1013,12 @@
         "ci-bad-behavior",
         "git-bad-behavior",
         "release-bad-behavior",
+        "ux-qa",
         "db-migration-analyze",
         "contract-drift",
         "rust-witness",
         "authz-matrix",
+        "input-boundary",
         "agent-tool-supply",
         "release-readiness",
         "cost-budget"
@@ -963,10 +1042,12 @@
       "ci-bad-behavior",
       "git-bad-behavior",
       "release-bad-behavior",
+      "ux-qa",
       "db-migration-analyze",
       "contract-drift",
       "rust-witness",
       "authz-matrix",
+      "input-boundary",
       "agent-tool-supply",
       "release-readiness",
       "cost-budget"
@@ -976,12 +1057,12 @@
   "boundaries": {
     "artifact": {
       "path": "agent/boundaries.toml",
-      "content_fingerprint": "sha256:5cddf1e4795e01583b6c7cb11308051ec75904f66afce9c7c43d291e95af383f",
+      "content_fingerprint": "sha256:6a3023594b57b4e533c8a7152c821d36738b1db3c89630c4b315e99e62fa60b1",
       "stack_id": "rust-split-family-child",
       "stack_version": "1.0.0",
       "adapter_path_count": 0,
-      "event_contract_path_count": 0,
-      "generated_type_path_count": 0,
+      "event_contract_path_count": 2,
+      "generated_type_path_count": 1,
       "client_marker_count": 7,
       "streaming_exception_count": 1
     },
@@ -990,7 +1071,7 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-06-11T22:21:47.942920557+00:00",
+    "generated_at": "2026-06-12T10:13:01.789283811+00:00",
     "repo": ".",
     "auditor_version": "1.6.10",
     "status": "review",
@@ -1028,22 +1109,336 @@
       ]
     },
     "summary": {
-      "files_scanned": 54,
-      "files_considered": 2,
-      "active_files": 2,
+      "files_scanned": 368,
+      "files_considered": 177,
+      "active_files": 177,
       "exact_file_classes": 0,
       "hard_classes": 0,
-      "warning_classes": 1,
+      "warning_classes": 11,
       "hard_instances": 0,
-      "warning_instances": 3,
-      "duplicate_lines": 1,
-      "duplicate_tokens": 2,
-      "duplicate_bytes": 20,
-      "total_redundant_lines": 2,
-      "total_redundant_tokens": 4,
-      "total_redundant_bytes": 40
+      "warning_instances": 28,
+      "duplicate_lines": 46,
+      "duplicate_tokens": 113,
+      "duplicate_bytes": 1114,
+      "total_redundant_lines": 57,
+      "total_redundant_tokens": 120,
+      "total_redundant_bytes": 1201
     },
     "classes": [
+      {
+        "id": "copy-code-unit-rust-5f5a3f96d274336f",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "ensure_account_capacity",
+        "duplicate_lines": 14,
+        "duplicate_tokens": 37,
+        "duplicate_bytes": 400,
+        "instance_count": 2,
+        "total_redundant_lines": 14,
+        "total_redundant_tokens": 37,
+        "total_redundant_bytes": 400,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "65b8f081882a465a",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-cli/src/jailhard/browser.rs",
+            "language": "rust",
+            "start_line": 97,
+            "end_line": 111,
+            "unit_name": "ensure_account_capacity"
+          },
+          {
+            "path": "crates/jailgun-orchestrator/src/agent/accounts.rs",
+            "language": "rust",
+            "start_line": 83,
+            "end_line": 97,
+            "unit_name": "ensure_account_capacity"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-unit-rust-18f5cfa0a6c192c4",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "parse_env_overrides",
+        "duplicate_lines": 12,
+        "duplicate_tokens": 46,
+        "duplicate_bytes": 392,
+        "instance_count": 2,
+        "total_redundant_lines": 12,
+        "total_redundant_tokens": 46,
+        "total_redundant_bytes": 392,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "d8c29558930f148a",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-cli/src/auth/bridge.rs",
+            "language": "rust",
+            "start_line": 30,
+            "end_line": 42,
+            "unit_name": "parse_env_overrides"
+          },
+          {
+            "path": "crates/jailgun-cli/src/jailhard/browser.rs",
+            "language": "rust",
+            "start_line": 174,
+            "end_line": 186,
+            "unit_name": "parse_env_overrides"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-unit-rust-154afe7a2a0c026c",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "new",
+        "duplicate_lines": 3,
+        "duplicate_tokens": 2,
+        "duplicate_bytes": 32,
+        "instance_count": 3,
+        "total_redundant_lines": 6,
+        "total_redundant_tokens": 4,
+        "total_redundant_bytes": 64,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "4fafd1f616332725",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-deploy/src/fake/ci_tracker.rs",
+            "language": "rust",
+            "start_line": 15,
+            "end_line": 18,
+            "unit_name": "new"
+          },
+          {
+            "path": "crates/jailgun-deploy/src/fake/job.rs",
+            "language": "rust",
+            "start_line": 15,
+            "end_line": 18,
+            "unit_name": "new"
+          },
+          {
+            "path": "crates/jailgun-deploy/src/fake/upload.rs",
+            "language": "rust",
+            "start_line": 14,
+            "end_line": 17,
+            "unit_name": "new"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-body-rust-dc1683e0676e5adb",
+        "kind": "exact_unit_different_name",
+        "severity": "warning",
+        "confidence": "medium",
+        "language": "rust",
+        "duplicate_lines": 2,
+        "duplicate_tokens": 1,
+        "duplicate_bytes": 12,
+        "instance_count": 4,
+        "total_redundant_lines": 6,
+        "total_redundant_tokens": 3,
+        "total_redundant_bytes": 36,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "883909654eb75831",
+        "reason": "same body appears under different names across files",
+        "recommended_action": "choose one owner for the shared body or intentionally differentiate the behavior",
+        "instances": [
+          {
+            "path": "crates/jailgun-core/src/browser_registry/leases/lock.rs",
+            "language": "rust",
+            "start_line": 75,
+            "end_line": 77,
+            "unit_name": "lock_file_exclusive"
+          },
+          {
+            "path": "crates/jailgun-core/src/browser_registry/leases/lock.rs",
+            "language": "rust",
+            "start_line": 80,
+            "end_line": 82,
+            "unit_name": "unlock_file"
+          },
+          {
+            "path": "crates/jailgun-core/src/browser_registry/storage.rs",
+            "language": "rust",
+            "start_line": 54,
+            "end_line": 56,
+            "unit_name": "set_private_dir_permissions"
+          },
+          {
+            "path": "crates/jailgun-core/src/browser_registry/storage.rs",
+            "language": "rust",
+            "start_line": 70,
+            "end_line": 72,
+            "unit_name": "set_private_file_permissions"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-unit-rust-efb906b284f83935",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "timestamp_now",
+        "duplicate_lines": 4,
+        "duplicate_tokens": 12,
+        "duplicate_bytes": 121,
+        "instance_count": 2,
+        "total_redundant_lines": 4,
+        "total_redundant_tokens": 12,
+        "total_redundant_bytes": 121,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "75d24bad70537ab9",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-cli/src/auth/mod.rs",
+            "language": "rust",
+            "start_line": 138,
+            "end_line": 142,
+            "unit_name": "timestamp_now"
+          },
+          {
+            "path": "crates/jailgun-orchestrator/src/run/bridge_flow.rs",
+            "language": "rust",
+            "start_line": 183,
+            "end_line": 187,
+            "unit_name": "timestamp_now"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-body-rust-292e97ca3c1379b2",
+        "kind": "exact_unit_different_name",
+        "severity": "warning",
+        "confidence": "medium",
+        "language": "rust",
+        "duplicate_lines": 2,
+        "duplicate_tokens": 1,
+        "duplicate_bytes": 10,
+        "instance_count": 3,
+        "total_redundant_lines": 4,
+        "total_redundant_tokens": 2,
+        "total_redundant_bytes": 20,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "14f560c367920139",
+        "reason": "same body appears under different names across files",
+        "recommended_action": "choose one owner for the shared body or intentionally differentiate the behavior",
+        "instances": [
+          {
+            "path": "crates/jailgun-core/src/agent/request.rs",
+            "language": "rust",
+            "start_line": 243,
+            "end_line": 245,
+            "unit_name": "default_true"
+          },
+          {
+            "path": "crates/jailgun-core/src/browser_registry/leases.rs",
+            "language": "rust",
+            "start_line": 439,
+            "end_line": 441,
+            "unit_name": "owner_process_is_alive"
+          },
+          {
+            "path": "crates/jailgun-orchestrator/src/bridge/command.rs",
+            "language": "rust",
+            "start_line": 45,
+            "end_line": 47,
+            "unit_name": "default_delete_after_upload"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-unit-rust-12c9eb48343252bd",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "new",
+        "duplicate_lines": 3,
+        "duplicate_tokens": 4,
+        "duplicate_bytes": 42,
+        "instance_count": 2,
+        "total_redundant_lines": 3,
+        "total_redundant_tokens": 4,
+        "total_redundant_bytes": 42,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "c7cbbb1e02314b4f",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-deploy/src/shell/job.rs",
+            "language": "rust",
+            "start_line": 20,
+            "end_line": 23,
+            "unit_name": "new"
+          },
+          {
+            "path": "crates/jailgun-deploy/src/shell/upload.rs",
+            "language": "rust",
+            "start_line": 15,
+            "end_line": 18,
+            "unit_name": "new"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-unit-rust-45d3346de33bc918",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "publish",
+        "duplicate_lines": 2,
+        "duplicate_tokens": 5,
+        "duplicate_bytes": 33,
+        "instance_count": 2,
+        "total_redundant_lines": 2,
+        "total_redundant_tokens": 5,
+        "total_redundant_bytes": 33,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "f049280259622394",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-deploy/src/deploy/events.rs",
+            "language": "rust",
+            "start_line": 10,
+            "end_line": 12,
+            "unit_name": "publish"
+          },
+          {
+            "path": "crates/jailgun-orchestrator/src/run/publish.rs",
+            "language": "rust",
+            "start_line": 4,
+            "end_line": 6,
+            "unit_name": "publish"
+          }
+        ]
+      },
       {
         "id": "copy-code-body-rust-0a76d27a920f262f",
         "kind": "exact_unit_different_name",
@@ -1083,6 +1478,84 @@
             "start_line": 50,
             "end_line": 51,
             "unit_name": "fmt"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-unit-rust-20ddeed31635ae6b",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "rust",
+        "unit_name": "shell_quote",
+        "duplicate_lines": 2,
+        "duplicate_tokens": 3,
+        "duplicate_bytes": 51,
+        "instance_count": 2,
+        "total_redundant_lines": 2,
+        "total_redundant_tokens": 3,
+        "total_redundant_bytes": 51,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "1d0c478937cec9d7",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "crates/jailgun-deploy/src/shell.rs",
+            "language": "rust",
+            "start_line": 17,
+            "end_line": 19,
+            "unit_name": "shell_quote"
+          },
+          {
+            "path": "crates/jailgun-deploy/src/util.rs",
+            "language": "rust",
+            "start_line": 6,
+            "end_line": 8,
+            "unit_name": "shell_quote"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-body-rust-d10b36aa74a59bcf",
+        "kind": "exact_unit_different_name",
+        "severity": "warning",
+        "confidence": "medium",
+        "language": "rust",
+        "duplicate_lines": 1,
+        "duplicate_tokens": 0,
+        "duplicate_bytes": 1,
+        "instance_count": 3,
+        "total_redundant_lines": 2,
+        "total_redundant_tokens": 0,
+        "total_redundant_bytes": 2,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "00372b9f2e3e61f6",
+        "reason": "same body appears under different names across files",
+        "recommended_action": "choose one owner for the shared body or intentionally differentiate the behavior",
+        "instances": [
+          {
+            "path": "crates/jailgun-core/src/agent_error.rs",
+            "language": "rust",
+            "start_line": 35,
+            "end_line": 36,
+            "unit_name": "agent_error"
+          },
+          {
+            "path": "crates/jailgun-deploy/src/deploy/model.rs",
+            "language": "rust",
+            "start_line": 151,
+            "end_line": 152,
+            "unit_name": "write_receipt"
+          },
+          {
+            "path": "crates/jailgun-server/src/bus.rs",
+            "language": "rust",
+            "start_line": 27,
+            "end_line": 28,
+            "unit_name": "publish"
           }
         ]
       }
@@ -1327,27 +1800,48 @@
   "findings": [
     {
       "severity": "medium",
-      "category": "security",
-      "path": ".github/workflows/jankurai.yml",
-      "problem": "`Security and supply-chain posture` scored 80 below the standard floor of 85",
-      "agent_fix": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
+      "category": "shape",
+      "path": ".",
+      "problem": "`Code shape and semantic surface` scored 80 below the standard floor of 85",
+      "agent_fix": "split large or ambiguous authored code into smaller semantic modules with focused tests",
       "evidence": [
-        "lockfile present",
-        "secret or dependency scan tooling found",
-        "provenance/SBOM tooling found",
-        "workflow linting tooling found"
+        "largest authored code file: crates/jailgun-core/src/browser_registry/leases.rs (441 LOC)",
+        "most code files stay under 300 LOC",
+        "copy-code advisory classes found: 11 (advisory only, no score impact)",
+        "rust bad-behavior advisory signals: 425"
       ],
-      "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
+      "check_id": "HLT-001-DEAD-MARKER:shape",
       "hardness": "soft",
       "confidence": 0.76,
-      "evidence_kind": "workflow-command",
-      "rerun_command": "just security",
-      "fingerprint": "sha256:3e21704bc51e05ff9b3194cbc4eea62a77cce19f572ea9056e29ca3ce474c7bd",
-      "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
-      "tlr": "Security, secrets, agency",
-      "lane": "security",
-      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
-      "owner": "ops"
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:d3464f5131306ae32b0470db781e558575a3108f20fe67563cb3380701b730cf",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "tools"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "Cargo.lock",
+      "problem": "generated zone `Cargo.lock` has an uncommitted hand-edit at `Cargo.lock` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `Cargo.lock` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`Cargo.lock` was hand-edited inside declared generated zone `Cargo.lock`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:6bdf6f31ab054c7a86dde856885fef44c0ca739360d260e05a5196da7624ee57",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "workspace"
     },
     {
       "severity": "medium",
@@ -1375,30 +1869,605 @@
     },
     {
       "severity": "medium",
-      "category": "observability",
-      "path": "docs/testing.md",
-      "problem": "`Observability and repair evidence` scored 73 below the standard floor of 85",
-      "agent_fix": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
+      "category": "governance",
+      "path": "contracts/fixtures/events/auth-action-needed.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-action-needed.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/auth-action-needed.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
       "evidence": [
-        "ops/observability directory present",
-        "agent-friendly exception pattern found",
-        "repair-hint and receipt convention are documented",
-        "repair receipt guidance is documented"
+        "`contracts/fixtures/events/auth-action-needed.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
       ],
-      "check_id": "HLT-017-OPAQUE-OBSERVABILITY:observability",
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
       "hardness": "soft",
       "confidence": 0.76,
-      "evidence_kind": "repository-scan",
-      "rerun_command": "just score",
-      "fingerprint": "sha256:56d676fd1b73a2be8b175b8439d63627e25a1a51e3df3a37d79e519f5ba3f751",
-      "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
-      "tlr": "Repair",
-      "lane": "observability",
-      "docs_url": "agent/JANKURAI_STANDARD.md#repair-receipts",
-      "owner": "standard"
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b1d8556d0eb75b09b9100e5abda76c8c358495adda6024c3994c25763b371e42",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/auth-code-requested.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-code-requested.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/auth-code-requested.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/auth-code-requested.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:67ee9ddaa0a0075b3a5fc7f6bd8debffe6bdbc83f47d0e8188d323c0830a5fea",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/auth-code-submitted.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-code-submitted.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/auth-code-submitted.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/auth-code-submitted.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:5215eb36621f3f77ec6258a004b9739a6978a178620de9c20775628a216c0a6d",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/auth-complete.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-complete.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/auth-complete.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/auth-complete.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b6cff5a1cb1938ad2412a5c72bc41cdd9a2793e352966c1c94c3886ea0b49f29",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/auth-failed.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-failed.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/auth-failed.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/auth-failed.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:02f19886dc768a15c62cbedd4700de98c9de75af5ba8fe1e4d5b21ce9264fb85",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/auth-state.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-state.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/auth-state.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/auth-state.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:d9cf7693f0ae2dafd0ef9d51ee809477d7f7f3f324892e4915f5ca63aa0a3f00",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/browser-log.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/browser-log.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/browser-log.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/browser-log.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:a61fb177077ebb87be7d709dff8f55ef1c99a625938c0917011e0a1eb8e52e5e",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/deploy-finished.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/deploy-finished.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/deploy-finished.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/deploy-finished.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:4949315a2249c65d777c1379101854522008a27924ba8be88bb36ca6195535f0",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/deploy-queued.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/deploy-queued.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/deploy-queued.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/deploy-queued.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:8c8ecabe70735058b56fee594c4671bb1703e41dd644dacdc286e73356eda053",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/download-receipt.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/download-receipt.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/download-receipt.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/download-receipt.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:18237e7c06e5e4a8fb5affe38cdd1f5fc73794fc5ccc3b6e10a0df7bc985e7cc",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/error.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/error.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/error.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/error.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:f1e917743656b7290f8d3a1d0599dd99a6376fd47b0aaf85f24d91ad65732083",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/prompt-policy-deny.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/prompt-policy-deny.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/prompt-policy-deny.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/prompt-policy-deny.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:ade8146fa8850eb2420ce701ca33fbc3e7864e383bdf0342dadd495c4e1e8b0c",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/prompt-submitted.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/prompt-submitted.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/prompt-submitted.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/prompt-submitted.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:1c9844bc41641518759a25982516c3aa73edf56b025dadb19cfaca5c8d9e8471",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/rate-limit-detected.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/rate-limit-detected.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/rate-limit-detected.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/rate-limit-detected.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:c7be4299eebff7899e54b91395efa1ad00eca8b88887f1ea40912f686a82a608",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/remote-safety.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/remote-safety.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/remote-safety.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/remote-safety.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b5604477353559f19ad9357e668c0355f5d279ed9f68c40038085fd0fe989f30",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/run-started.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/run-started.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/run-started.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/run-started.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:436e89c605093d1377a1e9020fb39e76f708c51dffd776f07807ce548cf65424",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/session-expired.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/session-expired.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/session-expired.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/session-expired.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:2137152ab75c91ee9c8e58b644eba1ab13e65a4f060bfe1f6c392e817ac51897",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/tab-opened.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/tab-opened.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/tab-opened.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/tab-opened.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:8f413cbc8923cbdd30910e566e6e291d7a3f80b56b0d1b054909d5367aecb326",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
+    },
+    {
+      "severity": "medium",
+      "category": "governance",
+      "path": "contracts/fixtures/events/tar-discovered.json",
+      "problem": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/tar-discovered.json` instead of a regeneration",
+      "agent_fix": "revert the in-place edit to `contracts/fixtures/events/tar-discovered.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "evidence": [
+        "`contracts/fixtures/events/tar-discovered.json` was hand-edited inside declared generated zone `contracts/fixtures/events/`"
+      ],
+      "check_id": "HLT-045-GENERATED-ZONE-GOVERNANCE:governance",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:645182cd89f82d6f6d63abb87ca9eff8dc26bfed37ad94ad6ff893b1afb7b5c4",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "contracts"
     }
   ],
   "agent_fix_queue": [
+    {
+      "path": "Cargo.lock",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "workspace",
+      "task": "revert the in-place edit to `Cargo.lock` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `Cargo.lock` has an uncommitted hand-edit at `Cargo.lock` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/auth-action-needed.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/auth-action-needed.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-action-needed.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/auth-code-requested.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/auth-code-requested.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-code-requested.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/auth-code-submitted.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/auth-code-submitted.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-code-submitted.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/auth-complete.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/auth-complete.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-complete.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/auth-failed.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/auth-failed.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-failed.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/auth-state.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/auth-state.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/auth-state.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/browser-log.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/browser-log.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/browser-log.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/deploy-finished.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/deploy-finished.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/deploy-finished.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/deploy-queued.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/deploy-queued.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/deploy-queued.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/download-receipt.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/download-receipt.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/download-receipt.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/error.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/error.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/error.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/prompt-policy-deny.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/prompt-policy-deny.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/prompt-policy-deny.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/prompt-submitted.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/prompt-submitted.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/prompt-submitted.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/rate-limit-detected.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/rate-limit-detected.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/rate-limit-detected.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/remote-safety.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/remote-safety.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/remote-safety.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/run-started.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/run-started.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/run-started.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/session-expired.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/session-expired.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/session-expired.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/tab-opened.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/tab-opened.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/tab-opened.json` instead of a regeneration"
+    },
+    {
+      "path": "contracts/fixtures/events/tar-discovered.json",
+      "priority": "medium",
+      "rule_id": "HLT-045-GENERATED-ZONE-GOVERNANCE",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "contracts",
+      "task": "revert the in-place edit to `contracts/fixtures/events/tar-discovered.json` and regenerate it from the declared source/command in `agent/generated-zones.toml`; do not patch generated output by hand",
+      "why": "generated zone `contracts/fixtures/events/` has an uncommitted hand-edit at `contracts/fixtures/events/tar-discovered.json` instead of a regeneration"
+    },
     {
       "path": "Justfile",
       "priority": "medium",
@@ -1410,24 +2479,14 @@
       "why": "`Build speed signals` scored 80 below the standard floor of 85"
     },
     {
-      "path": "docs/testing.md",
+      "path": ".",
       "priority": "medium",
-      "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
-      "tlr": "Repair",
-      "lane": "observability",
-      "owner": "standard",
-      "task": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
-      "why": "`Observability and repair evidence` scored 73 below the standard floor of 85"
-    },
-    {
-      "path": ".github/workflows/jankurai.yml",
-      "priority": "medium",
-      "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
-      "tlr": "Security, secrets, agency",
-      "lane": "security",
-      "owner": "ops",
-      "task": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
-      "why": "`Security and supply-chain posture` scored 80 below the standard floor of 85"
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "tools",
+      "task": "split large or ambiguous authored code into smaller semantic modules with focused tests",
+      "why": "`Code shape and semantic surface` scored 80 below the standard floor of 85"
     }
   ]
 }
