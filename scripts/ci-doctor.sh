@@ -1,15 +1,43 @@
 #!/usr/bin/env bash
 set -euo pipefail
-JANKURAI_MIN_VERSION="1.6.1"
 
-for tool in cargo git jq jankurai; do
-  command -v "$tool" >/dev/null 2>&1 || { echo "missing $tool" >&2; exit 1; }
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=ops/ci/lib.sh
+source "$script_dir/../ops/ci/lib.sh"
+ci_enter_repo_root "$script_dir"
+
+required=(
+  bash
+  cargo
+  git
+  node
+  npm
+  python3
+  rg
+)
+
+for cmd in "${required[@]}"; do
+  ci_require_cmd "$cmd"
 done
 
-version="$(jankurai --version 2>&1 | awk '{print $2}' | head -1 || true)"
-if [ -z "$version" ] || [ "$(printf '%s\n%s\n' "$JANKURAI_MIN_VERSION" "$version" | sort -V | head -1)" != "$JANKURAI_MIN_VERSION" ]; then
-  printf 'expected jankurai >= %s, got: %s\n' "$JANKURAI_MIN_VERSION" "${version:-unknown}" >&2
-  exit 1
+ci_log "rust toolchain"
+rustc --version
+cargo --version
+
+ci_log "node toolchain"
+node --version
+npm --version
+
+if command -v cargo-audit >/dev/null 2>&1; then
+  ci_log "optional cargo-audit present"
+else
+  ci_warn "optional cargo-audit not installed"
 fi
 
-echo "split-family child CI prerequisites present"
+if command -v gitleaks >/dev/null 2>&1; then
+  ci_log "optional gitleaks present"
+else
+  ci_warn "optional gitleaks not installed"
+fi
+
+ci_log "local CI dependencies available"

@@ -1,22 +1,53 @@
-# Release
+# Release Readiness
 
-jekko-jailgun releases use the split-family launch gate and keep a reproducible
-release record.
+Jailgun is not released from local runtime state. A release candidate must be
+reproducible from tracked source, generated contract artifacts, and CI evidence.
 
-Required release evidence:
+## Version Source
 
-- changelog entry in `CHANGELOG.md`
-- CI transcript from `bash scripts/ci-local.sh`
-- Jankurai score artifacts from `bash ops/ci/jankurai.sh`
-- checksum/provenance/SBOM evidence for any produced artifact
-- rollback plan: revert the release commit and rerun `bash scripts/ci-local.sh`
-- monitoring note: watch CI, issue reports, and downstream portal sync after publish
-- abuse and rate-limit note: this child repo publishes no network service by default
+- Rust crate versions live in each `crates/*/Cargo.toml`.
+- Node package versions live in `package.json` and workspace package manifests.
+- User-facing changes are recorded in `CHANGELOG.md`.
 
-Release steps:
+## Required Evidence
 
-1. Update the version source in `Cargo.toml`.
-2. Update `CHANGELOG.md`.
-3. Run `bash scripts/ci-local.sh`.
-4. Commit refreshed `agent/repo-score.json` and `agent/repo-score.md`.
-5. Attach checksums, provenance, and SBOM evidence to the release record.
+Run these commands before tagging:
+
+```bash
+bash scripts/ci-doctor.sh
+bash scripts/ci-local.sh
+bash ops/ci/release.sh
+bash ops/ci/jankurai.sh
+```
+
+The expected release artifacts are:
+
+- `agent/repo-score.json`
+- `agent/repo-score.md`
+- `agent/jankurai-badge.svg`
+- `agent/jankurai-badge.json`
+- `target/jankurai/copy-code.json`
+- `target/jankurai/ux-qa.json`
+
+## Release Process
+
+This release process is the tracked control surface for release readiness.
+
+1. Start from a clean worktree except for intentional release artifacts.
+2. Regenerate contracts and audit artifacts through the documented CI scripts;
+   do not hand-edit generated outputs.
+3. Run the required evidence commands above and inspect failures before tagging.
+4. Tag only after release evidence, provenance, and rollback notes are current.
+
+## Integrity and Provenance
+
+Release CI must pin external GitHub Actions by full commit SHA, set job
+timeouts, use workflow concurrency, and upload the generated audit, UX, and
+copy-code evidence. Secrets are not required for validation.
+
+## Rollback
+
+Remote deploy rollback is handled by the Rust cleanup policy. Dirty checkouts,
+missing `origin/main`, failed preservation refs, and failed receipt writes stop
+the deploy. A failed release tag should be superseded by a new tag rather than
+rewritten.

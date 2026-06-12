@@ -1,92 +1,165 @@
 {
+  "workspace": "jailgun",
   "tests": {
-    ".github/workflows/": {
-      "command": "bash scripts/ci-local.sh",
-      "purpose": "verify workflow dispatch stays aligned with local CI wrappers"
-    },
-    ".gitignore": {
-      "command": "just fast",
-      "purpose": "verify ignored artifacts do not hide source files"
-    },
-    ".gitlab-ci.yml": {
-      "command": "bash scripts/ci-local.sh",
-      "purpose": "verify GitLab dispatch stays aligned with local CI wrappers"
-    },
     "AGENTS.md": {
-      "command": "just fast",
-      "purpose": "verify repo instructions stay visible"
-    },
-    "Cargo.lock": {
-      "command": "just fast",
-      "purpose": "verify dependency lock stays in sync"
-    },
-    "Cargo.toml": {
-      "command": "just fast",
-      "purpose": "verify the package manifest stays parseable"
-    },
-    "Justfile": {
-      "command": "just fast",
-      "purpose": "verify lane wrappers stay runnable"
+      "command": "bash ops/ci/jankurai.sh",
+      "purpose": "verify repository agent instructions remain audit-visible",
+      "lane": "audit"
     },
     "README.md": {
-      "command": "just fast",
-      "purpose": "verify the repo README stays in sync"
+      "command": "bash ops/ci/jankurai.sh",
+      "purpose": "verify badge, generated report links, and repo guidance stay aligned",
+      "lane": "audit"
+    },
+    "CHANGELOG.md": {
+      "command": "bash ops/ci/release.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify release change log and audit evidence stay aligned",
+      "lane": "release"
+    },
+    ".env.example": {
+      "command": "bash ops/ci/scan.sh",
+      "purpose": "verify example environment values contain no secrets or private defaults",
+      "lane": "security"
+    },
+    ".gitignore": {
+      "command": "bash ops/ci/scan.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify ignored runtime state remains outside committed surfaces",
+      "lane": "security"
+    },
+    "Justfile": {
+      "command": "bash scripts/ci-local.sh",
+      "purpose": "verify Just targets stay aligned with local CI entrypoints",
+      "lane": "fast"
+    },
+    "rust-toolchain.toml": {
+      "command": "bash scripts/ci-doctor.sh && bash ops/ci/rust.sh",
+      "purpose": "verify pinned Rust toolchain and components match local CI",
+      "lane": "rust"
     },
     "agent/": {
       "command": "bash ops/ci/jankurai.sh",
-      "purpose": "verify the Jankurai metadata bundle stays clean"
+      "purpose": "verify Jankurai ownership, generated-zone, badge, and proof metadata",
+      "lane": "audit"
+    },
+    ".jankurai/": {
+      "command": "bash ops/ci/jankurai.sh",
+      "purpose": "verify Jankurai score history remains routed through audit governance",
+      "lane": "audit"
+    },
+    "assets/": {
+      "command": "bash ops/ci/jankurai.sh",
+      "purpose": "verify repository assets remain routed through audit metadata",
+      "lane": "audit"
     },
     "docs/": {
-      "command": "just fast",
-      "purpose": "verify agent-readable docs stay routed"
+      "command": "bash ops/ci/release.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify documentation remains routed through governance and release lanes",
+      "lane": "audit"
     },
-    "docs/testing.md": {
-      "command": "bash ops/ci/jankurai.sh",
-      "purpose": "verify testing, repair receipt, and launch-gate evidence stays audit-clean"
-    },
-    "ops/": {
-      "command": "bash scripts/ci-local.sh",
-      "purpose": "verify CI wrappers and hooks stay runnable"
-    },
-    "rust-toolchain.toml": {
-      "command": "just fast",
-      "purpose": "verify the Rust toolchain pin stays parseable"
-    },
-    "scripts/": {
-      "command": "bash -n scripts/ci-doctor.sh && bash -n scripts/ci-local.sh",
-      "purpose": "verify local CI helper scripts parse"
-    },
-    "src/": {
-      "command": "just test",
-      "purpose": "verify the crate body and unit tests stay green"
-    },
-    "tests/": {
-      "command": "just test",
-      "purpose": "verify integration proof stays green"
-    },
-    "CHANGELOG.md": {
-      "command": "just fast",
-      "purpose": "verify release notes stay routed"
-    },
-    "crates/domain/": {
-      "command": "just test",
-      "purpose": "verify the domain error surface stays compiled"
-    },
-    "crates/domain/AGENTS.md": {
-      "command": "just test",
-      "purpose": "verify domain repair guidance stays paired with tests"
-    },
-    "crates/domain/Cargo.toml": {
-      "command": "just test",
-      "purpose": "verify domain crate manifest stays compiled"
+    "docs/release.md": {
+      "command": "bash ops/ci/release.sh",
+      "purpose": "verify release readiness documentation and artifact expectations",
+      "lane": "release"
     },
     "contracts/": {
-      "command": "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
-      "purpose": "verify contract drift checks and contract skeletons stay visible"
+      "command": "bash ops/ci/contracts.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify contract surfaces and generated-zone policy stay visible",
+      "lane": "contract"
+    },
+    "contracts/json-schema/event.schema.json": {
+      "command": "bash ops/ci/contracts.sh",
+      "purpose": "verify generated event schema has no drift",
+      "lane": "contract"
+    },
+    "contracts/fixtures/events/": {
+      "command": "bash ops/ci/contracts.sh",
+      "purpose": "verify generated event fixtures have no drift",
+      "lane": "contract"
     },
     "db/": {
-      "command": "jankurai doctor --fail-on critical",
-      "purpose": "verify database skeletons stay visible to the audit"
+      "command": "bash ops/ci/release.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify data-boundary docs, migration lanes, and constraint lanes stay governance-only until SQL exists",
+      "lane": "release"
+    },
+    "config/": {
+      "command": "bash ops/ci/scan.sh",
+      "purpose": "verify example configuration contains no local secrets or private defaults",
+      "lane": "security"
+    },
+    "prompts/examples/": {
+      "command": "bash ops/ci/scan.sh",
+      "purpose": "verify committed prompt examples contain no private task bodies or local paths",
+      "lane": "security"
+    },
+    "crates/": {
+      "command": "bash ops/ci/rust.sh && bash ops/ci/security.sh",
+      "purpose": "verify Rust workspace formatting, linting, tests, and security scans",
+      "lane": "rust"
+    },
+    "crates/jailgun-deploy/": {
+      "command": "bash ops/ci/rust.sh && bash ops/ci/copy-code.sh",
+      "purpose": "verify deploy behavior and duplicate-code evidence",
+      "lane": "rust"
+    },
+    "apps/": {
+      "command": "bash ops/ci/node.sh && bash ops/ci/ux-qa.sh && bash ops/ci/security.sh",
+      "purpose": "verify TypeScript, React, browser adapter, frontend build, rendered UX, and security surfaces",
+      "lane": "web"
+    },
+    "apps/dashboard/": {
+      "command": "bash ops/ci/node.sh && bash ops/ci/ux-qa.sh",
+      "purpose": "verify dashboard type checks, tests, build, and rendered UX artifacts",
+      "lane": "web"
+    },
+    ".github/": {
+      "command": "bash ops/ci/security.sh && bash ops/ci/release.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify CI changes preserve security, release, and Jankurai audit evidence",
+      "lane": "security"
+    },
+    "ops/": {
+      "command": "bash ops/ci/security.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify local CI lanes stay aligned with GitHub Actions",
+      "lane": "security"
+    },
+    "scripts/": {
+      "command": "bash scripts/ci-doctor.sh && bash scripts/ci-local.sh",
+      "purpose": "verify local CI entrypoints and generators remain runnable",
+      "lane": "fast"
+    },
+    "tools/": {
+      "command": "bash ops/ci/security.sh && bash ops/ci/jankurai.sh",
+      "purpose": "verify canonical tool wrappers delegate to governed CI lanes",
+      "lane": "security"
+    },
+    "test-fixtures/": {
+      "command": "bash ops/ci/rust.sh && bash ops/ci/e2e.sh",
+      "purpose": "verify deterministic fixture config and fake deploy e2e tests",
+      "lane": "rust"
+    },
+    "tsconfig.base.json": {
+      "command": "bash ops/ci/node.sh",
+      "purpose": "verify TypeScript project settings compile all workspaces",
+      "lane": "web"
+    },
+    "Cargo.toml": {
+      "command": "bash ops/ci/rust.sh && bash ops/ci/security.sh",
+      "purpose": "verify Rust dependency changes compile and pass security scans",
+      "lane": "rust"
+    },
+    "Cargo.lock": {
+      "command": "bash ops/ci/rust.sh && bash ops/ci/security.sh",
+      "purpose": "verify locked Rust dependencies compile and pass security scans",
+      "lane": "rust"
+    },
+    "package.json": {
+      "command": "bash ops/ci/node.sh && bash ops/ci/security.sh",
+      "purpose": "verify Node dependency changes typecheck, test, build, and audit",
+      "lane": "web"
+    },
+    "package-lock.json": {
+      "command": "bash ops/ci/node.sh && bash ops/ci/security.sh",
+      "purpose": "verify locked Node dependencies typecheck, test, build, and audit",
+      "lane": "web"
     }
   }
 }

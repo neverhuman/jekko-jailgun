@@ -1,64 +1,179 @@
-name: ci
+name: CI
 
 on:
-  workflow_dispatch:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
 
 permissions:
   contents: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  fast:
+  rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - run: bash ops/ci/rust.sh
+
+  node:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - run: bash ops/ci/fast.sh
-  check:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - run: bash ops/ci/check.sh
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - run: bash ops/ci/test.sh
-  typecheck:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - run: bash ops/ci/typecheck.sh
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - run: bash ops/ci/build.sh
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+          cache: npm
+      - run: bash ops/ci/node.sh
+
   security:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
-      - name: Security command receipts
-        run: |
-          : "gitleaks detect --source . --redact --report-format json --report-path .jankurai/security/gitleaks.json"
-          : "cargo audit --json > .jankurai/security/cargo-audit.json"
-          : "zizmor --offline --no-exit-codes --format json .github/workflows > .jankurai/security/zizmor.json"
-          : "syft . -o spdx-json=.jankurai/security/sbom.spdx.json"
-      - run: bash ops/ci/security.sh
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+      - run: sudo apt-get update && sudo apt-get install -y ripgrep
+      - run: bash tools/security-lane.sh # gitleaks detect dependency-review npm audit cargo audit syft sbom actionlint; catalog: jankurai security run . --out target/jankurai/security/evidence.json
+      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+        if: github.event_name == 'pull_request'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: security-evidence
+          path: |
+            target/jankurai/security/evidence.json
+
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - run: bash ops/ci/contracts.sh
+
+  ux-qa:
+    needs: [node]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: bash ops/ci/ux-qa.sh # catalog: jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ux-qa
+          path: |
+            target/jankurai/ux-qa.json
+            artifacts/ux-qa/
+
+  e2e:
+    needs: [rust, node]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y python3
+      - run: bash ops/ci/e2e.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure()
+        with:
+          name: e2e-artifacts
+          path: |
+            artifacts/
+
+  copy-code:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - name: Install Jankurai
+        run: cargo install --git https://github.com/neverhuman/jankurai.git --rev 34608d016de5fd24e677244112941d240ca00188 --locked --force jankurai
+      - run: bash ops/ci/copy-code.sh # catalog: cargo run -p jankurai -- copy-code . --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: copy-code
+          path: |
+            target/jankurai/copy-code.json
+            target/jankurai/copy-code.md
+
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - run: bash ops/ci/release.sh
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: release-readiness
+          path: |
+            target/jankurai/release-readiness.json
+
+  audit:
+    needs: [rust, node, security, contracts, ux-qa, copy-code, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "20"
+      - run: sudo apt-get update && sudo apt-get install -y ripgrep
+      - name: Install Jankurai
+        run: cargo install --git https://github.com/neverhuman/jankurai.git --rev 34608d016de5fd24e677244112941d240ca00188 --locked --force jankurai
+      - run: jankurai security run . --strict --profile ci --out target/jankurai/security/evidence.json
+      - run: bash ops/ci/jankurai.sh # jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md; jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md; jankurai proofbind verify . --changed-from origin/main; jankurai proofmark rust . --obligations target/jankurai/proofbind/obligations.json; cargo test -p jankurai --test language_bad_behavior; jankurai rust witness build .
+        env:
+          JANKURAI_CHECK_GIT_DIFF: "0"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: jankurai-audit
+          path: |
+            agent/repo-score.json
+            agent/repo-score.md
+            agent/jankurai-badge.svg
+            agent/jankurai-badge.json
+            target/jankurai/repair-queue.jsonl
+            target/jankurai/proofbind/surface-witness.json
+            target/jankurai/proofbind/obligations.json
+            target/jankurai/proofmark/proofmark-receipt.json
+            target/jankurai/proofmark/proof-receipt.json
+            target/jankurai/language-bad-behavior.log
+            target/jankurai/rust/witness-graph.json
+            target/jankurai/security/
