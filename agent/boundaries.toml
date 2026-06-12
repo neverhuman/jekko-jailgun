@@ -23,8 +23,13 @@ client_markers = [
     "nats",
     "redis streams",
 ]
-event_contract_paths = []
-generated_type_paths = []
+event_contract_paths = [
+    "contracts/json-schema/event.schema.json",
+    "contracts/fixtures/events/",
+]
+generated_type_paths = [
+    "contracts/json-schema/",
+]
 
 [rust]
 domain_paths = [
@@ -65,5 +70,11 @@ forbidden_web_imports = [
     "better-sqlite3",
     "@aws-sdk/client-s3",
 ]
-generated_contract_paths = []
-web_paths = []
+generated_contract_paths = [
+    "contracts/json-schema/",
+    "contracts/fixtures/",
+]
+web_paths = [
+    "apps/browser-adapter/",
+    "apps/dashboard/",
+]

@@ -127,3 +127,7 @@ performance-score-signature:
 # jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
 workspace-build-timings:
 	cargo build --workspace --locked --timings
+
+# Node workspace lane for the ported jailgun apps.
+node:
+	bash ops/ci/node.sh
