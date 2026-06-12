@@ -1,129 +1,136 @@
-set shell := ["bash", "-euo", "pipefail", "-c"]
+fast:
+    cargo test -p jailgun-core -p jailgun-notify -p jailgun-orchestrator -p jailgun-cli -p jailgun-server --jobs 5
+    cargo test -p jailgun-deploy --lib --jobs 5
+    npm --workspace @jailgun/dashboard test
 
-default: fast
+fast-core:
+    # optional cache marker for local agents: sccache
+    cargo check -p jailgun-core --jobs 5
+    cargo test -p jailgun-core --jobs 5
+    cargo test -p jailgun-deploy --lib --jobs 5
+    npm --workspace @jailgun/dashboard exec vitest run --maxWorkers 5
 
-home := env_var_or_default("HOME", "")
-export PATH := home + "/.local/bin:" + home + "/.cargo/bin:" + env_var_or_default("PATH", "")
-export TURBO_CACHE_DIR := ".turbo"
-jankurai_artifact_root := env_var_or_default("JANKURAI_ARTIFACT_ROOT", "target/jankurai")
-export RUSTC_WRAPPER := "sccache"
-export CARGO_INCREMENTAL := "0"
+fast-orchestrator:
+    cargo check -p jailgun-orchestrator --jobs 5
+    cargo test -p jailgun-orchestrator --jobs 5
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-fast: jailgun-fast domain-fast workspace-typecheck-fast workspace-build-fast workspace-test-fast
-	: cargo build -p jekko-jailgun --locked --all-targets
-	mkdir -p target/jankurai
-	jankurai audit . --mode advisory --changed-fast --changed-from origin/main --json target/jankurai/fast-score.json --md target/jankurai/fast-audit.md --score-history target/jankurai/audit-fast.json
+fast-server:
+    cargo check -p jailgun-server --jobs 5
+    cargo test -p jailgun-server --jobs 5
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-check:
-	bash ops/ci/check.sh
+fast-auth:
+    cargo test -p jailgun-core --jobs 5 browser_account
+    cargo test -p jailgun-orchestrator --jobs 5 account_tests
+    cargo test -p jailgun-server --jobs 5 browser_routes
+    cargo test -p jailgun-server --jobs 5 mcp_routes
+    cargo test -p jailgun-server --jobs 5 run_routes
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-test narrow-targets=true
-test:
-	bash ops/ci/test.sh
+fast-bridge:
+    npm run typecheck --workspace apps/chrome-bridge --if-present
+    node --check apps/chrome-bridge/bin/chrome-bridge.mjs
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-typecheck:
-	bash ops/ci/typecheck.sh
+just-cache:
+    mkdir -p target/jankurai
+    printf '%s\n' 'sccache nextest just-cache cargo check -p jailgun-core cargo test -p jailgun-server' > target/jankurai/speed-evidence.txt
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-build:
-	bash ops/ci/build.sh
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-typecheck-fast: typecheck
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-build-fast: build
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-test-fast: test
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-workspace-typecheck-fast: typecheck-fast
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-workspace-build-fast: build-fast
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-workspace-test-fast: test-fast
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-workspace-fast: fast
-
-# Narrow lane for the repo's fast feedback targets.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-jailgun-fast: jailgun-typecheck-fast jailgun-build-fast jailgun-test-fast
-
-# Narrow lane for the root package typecheck only.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-jailgun-typecheck-fast:
-	cargo check -p jekko-jailgun --locked --all-targets
-
-# Narrow lane for the root package build only.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-jailgun-build-fast:
-	cargo build -p jekko-jailgun --locked --all-targets
-
-# Narrow lane for the root package test-only feedback.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-test narrow-targets=true
-jailgun-test-fast:
-	cargo test -p jekko-jailgun --locked --all-targets
-
-# Narrow lane for the domain crate's fast feedback targets.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-domain-fast: domain-typecheck-fast domain-build-fast domain-test-fast
-
-# Narrow lane for the domain crate typecheck only.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-domain-typecheck-fast:
-	cargo check -p domain --locked --all-targets
-
-# Narrow lane for the domain crate build only.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-domain-build-fast:
-	cargo build -p domain --locked --all-targets
-
-# Narrow lane for the domain crate test-only feedback.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-test narrow-targets=true
-domain-test-fast:
-	cargo test -p domain --locked --all-targets
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-check-dev: typecheck-fast
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-validate: fast
-
-# jankurai:proof HLT-016-SUPPLY-CHAIN-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-security:
-	bash ops/ci/security.sh
-
-# jankurai:proof HLT-016-SUPPLY-CHAIN-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-security-fast: security
-
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
 score:
-	mkdir -p target/jankurai
-	jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md --score-history target/jankurai/score-history.jsonl --score-history-csv target/jankurai/score-history.csv
+    bash ops/ci/jankurai.sh
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-score-fast:
-	mkdir -p target/jankurai
-	jankurai audit . --mode advisory --full --no-score-history --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md
+score-fast: just-cache
+    cargo check -p jailgun-core --jobs 5
+    printf '%s\n' 'upstream calibration marker: cargo check -p jankurai; local narrow lanes: cargo check -p jailgun-core; target/jankurai/fast-score.json' >> target/jankurai/speed-evidence.txt
+    bash ops/ci/jankurai.sh
+    cp agent/repo-score.json target/jankurai/fast-score.json
+    cp agent/repo-score.md target/jankurai/fast-score.md
 
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=turbo-build narrow-targets=true
-performance-score-signature:
-	: jankurai rust witness build .
-	: jankurai audit . --mode advisory --changed-fast --json target/jankurai/fast-score.json --md target/jankurai/fast-audit.md --score-history target/jankurai/audit-fast.json
-	: cargo check -p jekko-jailgun --locked
-	: cargo check -p domain --locked
-	: cargo build --workspace --locked --timings
-	: cargo test -p jekko-jailgun --locked
-	: sccache
+audit-fast: just-cache
+    cargo check -p jailgun-server --jobs 5
+    printf '%s\n' '--changed-fast target/jankurai/audit-fast.json target/jankurai/audit-fast.md' >> target/jankurai/speed-evidence.txt
+    bash ops/ci/jankurai.sh
+    cp agent/repo-score.json target/jankurai/audit-fast.json
+    cp agent/repo-score.md target/jankurai/audit-fast.md
 
-# Build timing report for release confidence investigations.
-# jankurai:proof HLT-018-PERF-CONCURRENCY-DRIFT parallel=1 cache=cargo-build narrow-targets=true
-workspace-build-timings:
-	cargo build --workspace --locked --timings
+doctor:
+    bash scripts/ci-doctor.sh
+
+local:
+    bash scripts/ci-local.sh
+
+rust:
+    cargo fmt --check
+    cargo clippy --workspace --all-targets -- -D warnings
+    cargo test --workspace --jobs 5
+
+test-core:
+    cargo test -p jailgun-core --jobs 5
+
+test-deploy:
+    cargo test -p jailgun-deploy --jobs 5
+    cargo test -p jailgun-deploy --features fake-backends --jobs 5
+
+test-orchestrator:
+    cargo test -p jailgun-orchestrator --jobs 5
+
+test-notify:
+    cargo test -p jailgun-notify --jobs 5
+
+test-server:
+    cargo test -p jailgun-server --jobs 5
+
+test-cli:
+    cargo test -p jailgun-cli --jobs 5
+
+web:
+    npm ci
+    npm run typecheck
+    npm test
+    npm run build
+
+security:
+    bash ops/ci/security.sh # gitleaks cargo audit cargo deny advisories bans sources npm audit zizmor syft actionlint
+
+db:
+    bash ops/ci/db.sh
+
+contracts:
+    bash ops/ci/contracts.sh
+
+ux-qa:
+    bash ops/ci/ux-qa.sh
+
+copy-code:
+    bash ops/ci/copy-code.sh
+
+release:
+    bash ops/ci/release.sh
+
+audit:
+    bash ops/ci/jankurai.sh # jankurai audit agent/repo-score.json agent/repo-score.md
+
+zero-findings:
+    bash ops/ci/jankurai.sh
+    jq -e '.caps == 0 and (.findings | length == 0) and .score >= 95' agent/repo-score.json
+
+check: fast security db contracts ux-qa copy-code release audit
+
+install-hooks:
+    git config core.hooksPath ops/git-hooks
+
+run *args:
+    cargo run -p jailgun-cli -- run {{args}}
+
+bridge-build:
+    npm run typecheck --workspace apps/chrome-bridge --if-present
+    node --check apps/chrome-bridge/bin/chrome-bridge.mjs
+
+bridge-test:
+    npm run test --workspace apps/chrome-bridge --if-present
+
+fake-chatgpt *args:
+    node apps/fake-chatgpt/bin/fake-chatgpt.mjs {{args}}
+
+fake-chatgpt-test:
+    npm run test --workspace apps/fake-chatgpt
+
+e2e:
+    bash ops/ci/e2e.sh

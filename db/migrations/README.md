@@ -1,3 +1,5 @@
-# Migrations
+# Migration Lane
 
-Add versioned SQL migrations. Regenerate any derived artifacts with the recorded command in `agent/generated-zones.toml`.
+No SQL migrations are committed today. Future migrations must include a forward
+change, rollback instructions, lock scope, backfill plan, and proof command in
+the same change set.
