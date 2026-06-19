@@ -4,7 +4,10 @@ use crate::{DEFAULT_BROWSER_QUEUE_TIMEOUT_SECONDS, MAX_BROWSER_QUEUE_TIMEOUT_SEC
 use serde::{Deserialize, Serialize};
 
 pub const JAILGUN_AGENT_INTERFACE_VERSION: u16 = 1;
-pub const JAILGUN_AGENT_MAX_RUNTIME_SECONDS: u64 = 30 * 60;
+// Substantial agentic code generations (e.g. a metavision version evolution) routinely need
+// ~16-20 min of ChatGPT-Pro generation plus the artifact download; the old 30-min cap cut runs
+// off mid-download. 60 min gives major evolutions room to finish + be captured.
+pub const JAILGUN_AGENT_MAX_RUNTIME_SECONDS: u64 = 60 * 60;
 pub const JAILGUN_AGENT_MAX_TABS: u16 = 5;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
