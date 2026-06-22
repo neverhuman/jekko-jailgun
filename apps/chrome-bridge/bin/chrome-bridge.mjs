@@ -5556,7 +5556,127 @@ function artifactLabelForFailure(details = {}) {
   return 'artifact';
 }
 
+// ── Markdown salvage ────────────────────────────────────────────────────────────────────────────
+// When the assistant FINISHES but offers no downloadable .tar.gz/artifact (done-no-tar and friends),
+// ChatGPT has still produced the answer inline. Rather than fail the run, capture that inline response
+// and persist it as a real .md download, emitting the normal download-complete success. This makes the
+// bridge "work either way": a real artifact download is used when offered, otherwise the inline markdown
+// is salvaged to MD. Disable with JAILGUN_DISABLE_MD_SALVAGE=1; min length via JAILGUN_MD_SALVAGE_MIN.
+function unwrapWholeResponseFence(text) {
+  const s = String(text || '').trim();
+  if (!s.startsWith('```')) return s;
+  let body = s.slice(3);
+  const nl = body.indexOf('\n');
+  if (nl >= 0 && ['markdown', 'md', ''].includes(body.slice(0, nl).trim().toLowerCase())) {
+    body = body.slice(nl + 1);
+  }
+  body = body.replace(/\s*```\s*$/, '');
+  return body.trim();
+}
+
+function mdSalvageFilename(requestedName, md) {
+  const norm = (n) => (sanitizePathSegment(String(n).replace(/[^A-Za-z0-9._-]/g, '_')) || 'assistant-response').slice(0, 120);
+  const req = String(requestedName || '').trim();
+  if (/\.(md|markdown)$/i.test(req)) return norm(basename(req)).replace(/\.markdown$/i, '.md');
+  const mention = md.match(/\b([A-Za-z0-9][A-Za-z0-9._-]*\.md)\b/);
+  if (mention) return norm(mention[1]);
+  const h1 = md.match(/^\s*#\s+(.+?)\s*$/m);
+  if (h1) {
+    const slug = h1[1].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+    if (slug) return `${slug}.md`;
+  }
+  return 'assistant-response.md';
+}
+
+async function salvageMarkdownFromAssistantResponse(bridge, tab, envelope, kind, details = {}) {
+  if (process.env.JAILGUN_DISABLE_MD_SALVAGE === '1') return null;
+  const page = tab?.page;
+  if (!page || (typeof page.isClosed === 'function' && page.isClosed())) return null;
+  let best = '';
+  try {
+    const responses = await extractAssistantResponses(page);
+    if (Array.isArray(responses)) {
+      best = responses
+        .map((r) => String(r?.text || ''))
+        .filter(Boolean)
+        .sort((a, b) => b.length - a.length)[0] || '';
+    }
+  } catch {
+    return null;
+  }
+  const md = unwrapWholeResponseFence(best);
+  const minLen = Math.max(1, Number(process.env.JAILGUN_MD_SALVAGE_MIN ?? '1') || 1);
+  if (!md || md.trim().length < minLen) return null;
+  try {
+    const tabId = envelope?.tab_id ?? tab?.browserSlot ?? tab?.tabId ?? 1;
+    const runSeg = sanitizePathSegment(envelope?.run_id || 'run');
+    const tabSeg = `tab-${String(tabId).padStart(2, '0')}`;
+    const outputDir = join(bridge.options.downloadsDir, runSeg, tabSeg);
+    await mkdir(outputDir, { recursive: true });
+    const requested = artifactTargetName(bridge.options || {}) || details.target_name || '';
+    const localName = mdSalvageFilename(requested, md);
+    const localPath = join(outputDir, localName);
+    const buf = Buffer.from(md, 'utf8');
+    await writeFile(localPath, buf);
+    const sha256 = createHash('sha256').update(buf).digest('hex');
+    const stamp = timestamp();
+    const receiptPath = join(bridge.options.artifactsDir, 'receipts', runSeg, `${tabSeg}-download.json`);
+    const completePayload = {
+      sha256,
+      size_bytes: buf.length,
+      local_path: localPath,
+      receipt_path: receiptPath,
+      original_name: localName,
+      local_name: localName,
+      file_kind: 'downloaded-markdown',
+      artifact_kind: 'markdown',
+      validation_status: 'salvaged-from-response',
+      discovery_strategy: 'materialized_from_assistant_response',
+      download_url: null,
+      entry_count: 1,
+      started_at: stamp,
+      finished_at: stamp,
+      download_latency_ms: 0,
+      salvaged_after_kind: kind,
+    };
+    try {
+      await mkdir(resolve(receiptPath, '..'), { recursive: true });
+      await writeFile(receiptPath, JSON.stringify(completePayload, null, 2));
+    } catch {}
+    // keep a diagnostics bundle too (non-fatal), tagged as salvaged
+    try {
+      await writeNoLinkBundle(
+        { bridge, envelope, tabId, artifactsDir: bridge.options.artifactsDir, page },
+        { kind: `${kind}-salvaged-md`, message: 'assistant response salvaged to markdown', pageUrl: (typeof page.url === 'function' ? page.url() : ''), details },
+      );
+    } catch {}
+    const cleanup = await finalizeTabAfterDownload(bridge, tab, envelope, 'download-complete');
+    bridge.emit(envelope, 'download-complete', completePayload);
+    bridge.bridgeLog(envelope, 'download-complete', 'ok',
+      'no artifact download was offered; salvaged the inline assistant response to markdown', {
+        sha256,
+        size_bytes: String(buf.length),
+        file_kind: 'downloaded-markdown',
+        local_path: localPath,
+        receipt_path: receiptPath,
+        salvaged_after_kind: kind,
+        generation_stop_method: cleanup?.stopMethod || '',
+        tab_closed: String(Boolean(cleanup?.closed)),
+        cleanup_errors: (cleanup?.errors || []).join(';'),
+      }, 'warn');
+    return cleanup;
+  } catch (error) {
+    try {
+      bridge.bridgeLog(envelope, 'md-salvage', 'failed', 'markdown salvage failed; falling back to no-tar error',
+        { reason: error?.message || String(error) }, 'warn');
+    } catch {}
+    return null;
+  }
+}
+
 async function emitNoTarErrorAndCleanup(bridge, tab, envelope, kind, message, details = {}) {
+  const salvaged = await salvageMarkdownFromAssistantResponse(bridge, tab, envelope, kind, details);
+  if (salvaged) return salvaged;
   const page = tab?.page;
   const pageUrl = page && !page.isClosed() && typeof page.url === 'function' ? page.url() : '';
   const noLinkBundlePath = await writeNoLinkBundle({
@@ -6636,6 +6756,8 @@ async function assertNoTarCleanupSequencing(kind, message) {
   const tab = {
     page: {
       isClosed: () => false,
+      // no salvageable assistant response in this scenario -> exercises the error+cleanup path
+      __jailgunExtractAssistantResponses: async () => [],
       evaluate: async () => {
         calls.push('stopIfGenerating');
         return { clicked: false, reason: 'not-found' };
@@ -6674,6 +6796,52 @@ async function assertNoTarCleanupSequencing(kind, message) {
   }
   if (!cleanup.closed || cleanup.stopMethod !== 'not-active:not-found' || cleanup.errors.length > 0) {
     throw new Error(`${kind} cleanup result failed: ${JSON.stringify(cleanup)}`);
+  }
+}
+
+async function assertNoTarSalvagesMarkdownResponse() {
+  const root = await mkdtemp(join(tmpdir(), 'jailgun-md-salvage-'));
+  try {
+    const events = [];
+    const envelope = { v: PROTOCOL_VERSION, type: 'monitor-tab', run_id: 'run-salvage', tab_id: 3, ts: timestamp(), payload: {} };
+    const md = '# Lane Spec\n\nThis is the full markdown answer, long enough to salvage as a usable .md file.';
+    const tab = {
+      browserSlot: 3,
+      page: {
+        isClosed: () => false,
+        url: () => 'https://chatgpt.com/c/self-test',
+        title: async () => 'Self Test',
+        content: async () => '<html><body>x</body></html>',
+        evaluate: async () => '',
+        screenshot: async ({ path }) => { await writeFile(path, 'x'); },
+        __jailgunDiscoverTarCandidates: async () => ({ assistantRootCount: 1, scannedControlCount: 1, candidates: [], lastTextLength: md.length, lastTextPreview: 'Lane Spec', abFeedbackActive: false, abResponseCount: 0 }),
+        __jailgunExtractAssistantResponses: async () => ([{ index: 0, text: md, html: '' }]),
+      },
+    };
+    const bridge = {
+      options: { artifactsDir: root, downloadsDir: join(root, 'downloads') },
+      emit: (_envelope, type, payload) => { events.push({ type, payload }); },
+      bridgeLog: () => undefined,
+      closeTabAfterReceipt: async () => { bridge.emit(envelope, 'tab-closed', {}); tab.page = null; return true; },
+    };
+    const cleanup = await emitNoTarErrorAndCleanup(bridge, tab, envelope, 'done-no-tar', 'assistant finished but no tar.gz download candidate was found');
+    const complete = events.find((e) => e.type === 'download-complete');
+    const errored = events.find((e) => e.type === 'error');
+    if (!complete || errored) {
+      throw new Error(`salvage did not convert no-tar into download-complete: ${JSON.stringify(events.map((e) => e.type))}`);
+    }
+    if (!complete.payload.local_path || complete.payload.file_kind !== 'downloaded-markdown') {
+      throw new Error(`salvage payload malformed: ${JSON.stringify(complete.payload)}`);
+    }
+    const saved = await readFile(complete.payload.local_path, 'utf8');
+    if (!saved.includes('full markdown answer')) {
+      throw new Error(`salvaged markdown content missing: ${saved.slice(0, 80)}`);
+    }
+    if (!cleanup?.closed) {
+      throw new Error(`salvage cleanup did not close the tab: ${JSON.stringify(cleanup)}`);
+    }
+  } finally {
+    await rm(root, { recursive: true, force: true });
   }
 }
 
@@ -8825,6 +8993,7 @@ async function runSelfTest() {
   await assertLocalArchivePathSkipsGitArchive();
   await assertFreshSourceCloneArchivesLocalRepos();
   await assertDownloadCleanupSequencing();
+  await assertNoTarSalvagesMarkdownResponse();
   await assertNoTarCleanupSequencing('done-no-tar', 'assistant finished but no tar.gz download candidate was found');
   await assertNoTarCleanupSequencing('artifact-stall-no-tar', 'assistant stalled without a tar.gz download candidate');
   await assertNoTarCleanupSequencing('message-stream-no-tar', 'assistant hit message stream error without tar.gz after 0 retry attempts');

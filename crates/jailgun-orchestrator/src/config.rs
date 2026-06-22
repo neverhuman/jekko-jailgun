@@ -38,4 +38,46 @@ impl RunOptions {
     pub fn tabs(&self) -> u16 {
         self.tabs_override.unwrap_or(self.config.browser.tabs)
     }
+
+    /// The spawn cardinality for the jekko-web diagram: one box per browser tab
+    /// (sub-agent). Mirrors the flowgraph `spawn` node.
+    pub fn spawn_cardinality(&self) -> SpawnCardinality {
+        SpawnCardinality::for_tabs(self.tabs())
+    }
+}
+
+/// The spawn shape of a jailgun run — how many sub-agent (browser-tab) boxes it
+/// expands into. The runner parses `receipt_value()` into the flowgraph `spawn`
+/// node's cardinality so the diagram renders one box per tab.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct SpawnCardinality {
+    pub runtime: &'static str,
+    pub tabs: u16,
+}
+
+impl SpawnCardinality {
+    pub fn for_tabs(tabs: u16) -> Self {
+        Self {
+            runtime: "jailgun",
+            tabs,
+        }
+    }
+
+    /// Compact `key:val,…` value embedded in run metadata.
+    pub fn receipt_value(&self) -> String {
+        format!("runtime:{},tabs:{}", self.runtime, self.tabs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SpawnCardinality;
+
+    #[test]
+    fn spawn_cardinality_reports_tab_count() {
+        let card = SpawnCardinality::for_tabs(5);
+        assert_eq!(card.runtime, "jailgun");
+        assert_eq!(card.tabs, 5);
+        assert_eq!(card.receipt_value(), "runtime:jailgun,tabs:5");
+    }
 }
